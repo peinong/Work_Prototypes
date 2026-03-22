@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Japan 日本語">
+<meta name="theme-color" content="#c0392b">
+<link rel="manifest" href="manifest.json">
+<title>日本語 Japan Travel Guide</title>
+<style>
+  :root {
+    --red: #c0392b;
+    --red-light: #f9eae8;
+    --red-dark: #96281b;
+    --navy: #1a2535;
+    --text: #2c3e50;
+    --muted: #7f8c8d;
+    --bg: #f8f5f0;
+    --card: #ffffff;
+    --border: #e8e0d8;
+    --green: #27ae60;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--red);
+    color: white;
+    padding: 14px 20px 12px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .app-header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .app-header .subtitle { font-size: 11px; opacity: 0.85; margin-top: 1px; }
+  .header-flag { font-size: 28px; line-height: 1; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding-bottom: var(--safe-bottom);
+    z-index: 100;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+  }
+  .nav-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px 4px 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-btn .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-btn.active { color: var(--red); }
+  .nav-btn.active .nav-icon { transform: scale(1.1); }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    padding-bottom: calc(72px + var(--safe-bottom));
+    min-height: calc(100vh - 60px);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    background: var(--navy);
+    color: white;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 12px 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  /* ── QUICK REF TABLE ── */
+  .quick-ref-intro {
+    padding: 16px 16px 8px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .phrase-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .phrase-row:last-child { border-bottom: none; }
+
+  .phrase-jp {
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .phrase-right { display: flex; flex-direction: column; gap: 2px; justify-content: center; }
+  .phrase-romaji { font-size: 12px; color: var(--muted); font-style: italic; }
+  .phrase-en { font-size: 13px; color: var(--text); font-weight: 500; }
+
+  /* ── EMERGENCY BANNER ── */
+  .emergency-banner {
+    background: var(--red);
+    color: white;
+    margin: 12px 16px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .emergency-banner-header {
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+  .emergency-numbers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.2);
+  }
+  .emergency-num {
+    background: var(--red-dark);
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .emergency-num .num { font-size: 22px; font-weight: 800; }
+  .emergency-num .label { font-size: 10px; opacity: 0.85; margin-top: 2px; }
+
+  /* ── WRITING SYSTEM TABS ── */
+  .sub-tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 58px;
+    z-index: 50;
+  }
+  .sub-tab-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+  .sub-tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
+
+  .sub-panel { display: none; padding: 0 0 16px; }
+  .sub-panel.active { display: block; }
+
+  /* ── CHARACTER TABLE ── */
+  .char-table-wrap { overflow-x: auto; margin: 12px 16px; }
+  .char-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    min-width: 320px;
+  }
+  .char-table th {
+    background: var(--navy);
+    color: white;
+    padding: 8px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    width: 14%;
+  }
+  .char-table th:first-child { width: 10%; background: #141d2b; }
+  .char-table td {
+    padding: 8px 4px;
+    text-align: center;
+    border: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .char-table tr:nth-child(even) td { background: #fafaf8; }
+  .char-table .row-label {
+    background: var(--navy);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .char-cell { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .char-jp { font-size: 20px; line-height: 1.2; }
+  .char-ro { font-size: 9px; color: var(--muted); }
+  .char-empty { color: var(--border); font-size: 14px; }
+
+  /* ── CONFUSION TABLE ── */
+  .confusion-table { width: 100%; border-collapse: collapse; }
+  .confusion-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 12px;
+    font-size: 12px;
+    text-align: left;
+  }
+  .confusion-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .confusion-table tr:last-child td { border-bottom: none; }
+  .confusion-table tr:nth-child(even) td { background: #fafaf8; }
+  .confusion-jp { font-size: 18px; font-weight: 600; white-space: nowrap; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .tag-hira { background: #ebf5fb; color: #2471a3; }
+  .tag-kata { background: #eafaf1; color: #1e8449; }
+  .tag-both { background: #fef9e7; color: #b7950b; }
+
+  /* ── MEMORY STRATEGY ── */
+  .week-card {
+    margin: 0 16px 12px;
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .week-header {
+    background: var(--red-light);
+    color: var(--red-dark);
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 1px solid #f0d8d5;
+  }
+  .week-body { padding: 12px 16px; font-size: 13px; line-height: 1.6; color: var(--text); }
+
+  /* ── PHRASE TABLES ── */
+  .phrase-table { width: 100%; border-collapse: collapse; }
+  .phrase-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+  }
+  .phrase-table td {
+    padding: 11px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .phrase-table tr:last-child td { border-bottom: none; }
+  .phrase-table tr:nth-child(even) td { background: #fafaf8; }
+  .phrase-table .num-col { color: var(--muted); font-size: 11px; width: 28px; }
+  .phrase-table .jp-col { font-size: 18px; font-weight: 600; width: 40%; line-height: 1.3; }
+  .phrase-table .ro-col { font-size: 11px; color: var(--muted); font-style: italic; display: block; margin-top: 2px; }
+  .phrase-table .en-col { width: 45%; }
+  .phrase-table .note { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* ── SCENARIOS ── */
+  .scenario-list { padding: 8px 0; }
+
+  .scenario-card {
+    margin: 8px 16px;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .scenario-card.emergency { border-color: var(--red); }
+
+  .scenario-header {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .scenario-header:active { background: #f5f5f5; }
+  .scenario-card.emergency .scenario-header { background: var(--red-light); }
+  .scenario-card.open .scenario-header { background: #f5f5f5; }
+  .scenario-card.emergency.open .scenario-header { background: #f5e8e6; }
+
+  .scenario-emoji { font-size: 28px; line-height: 1; flex-shrink: 0; }
+  .scenario-info { flex: 1; }
+  .scenario-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .scenario-card.emergency .scenario-title { color: var(--red-dark); }
+  .scenario-count { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .scenario-chevron {
+    color: var(--muted);
+    font-size: 16px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .scenario-card.open .scenario-chevron { transform: rotate(180deg); }
+
+  .scenario-body { display: none; border-top: 1px solid var(--border); }
+  .scenario-card.open .scenario-body { display: block; }
+
+  .scenario-tip {
+    background: #faf8f3;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+    font-style: italic;
+  }
+  .scenario-card.emergency .scenario-tip { background: #fff5f4; }
+
+  /* ── SEARCH ── */
+  .search-bar {
+    padding: 12px 16px 8px;
+    position: sticky;
+    top: 58px;
+    background: var(--bg);
+    z-index: 50;
+  }
+  .search-input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237f8c8d' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+  }
+  .search-input:focus { border-color: var(--red); }
+  .search-input::placeholder { color: #bbb; }
+
+  /* ── NUMBERS TABLE ── */
+  .numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .number-cell {
+    background: white;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .number-jp { font-size: 17px; font-weight: 600; }
+  .number-ro { font-size: 11px; color: var(--muted); }
+  .number-en { font-size: 12px; color: var(--text); font-weight: 500; }
+
+  /* ── OVERVIEW TABLE ── */
+  .overview-table { width: 100%; border-collapse: collapse; }
+  .overview-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 12px;
+    font-size: 12px;
+    text-align: left;
+  }
+  .overview-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .overview-table tr:last-child td { border-bottom: none; }
+  .overview-jp { font-size: 20px; font-weight: 700; }
+
+  /* ── UTILITY ── */
+  .pad { padding: 12px 16px; }
+  .muted { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .mt8 { margin-top: 8px; }
+  .section-label {
+    padding: 16px 16px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+  }
+  .no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+    display: none;
+  }
+  .tip-box {
+    margin: 12px 16px;
+    background: #eaf4fb;
+    border-left: 3px solid #2980b9;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #1a5276;
+    line-height: 1.5;
+  }
+
+  /* ── HOME BANNER ── */
+  .home-banner {
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    color: white;
+    padding: 20px 20px 18px;
+    margin-bottom: 4px;
+  }
+  .home-banner h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .home-banner p { font-size: 13px; opacity: 0.88; line-height: 1.4; }
+  .home-banner .ganbare {
+    margin-top: 12px;
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <div class="app-header h1" style="font-size:18px;font-weight:700;">日本語 Travel Guide</div>
+    <div class="subtitle">Prepared for Pei-Nong · March 2026</div>
+  </div>
+  <div class="header-flag">🇯🇵</div>
+</header>
+
+<main class="main-content">
+
+  <!-- ══════════════════════════════════════════
+       TAB 1: HOME — Quick Reference
+  ══════════════════════════════════════════ -->
+  <div id="tab-home" class="tab-panel active">
+    <div class="home-banner">
+      <h2>Quick Reference</h2>
+      <p>12 essential phrases that work in almost every situation. Review these first.</p>
+      <div class="ganbare">がんばってください！ — Do your best!</div>
+    </div>
+
+    <div class="emergency-banner">
+      <div class="emergency-banner-header">🚨 Japan Emergency Numbers</div>
+      <div class="emergency-numbers">
+        <div class="emergency-num">
+          <div class="num">110</div>
+          <div class="label">Police 警察</div>
+        </div>
+        <div class="emergency-num">
+          <div class="num">119</div>
+          <div class="label">Ambulance 救急</div>
+        </div>
+        <div class="emergency-num">
+          <div class="num">050-3816-2787</div>
+          <div class="label">Tourist Hotline 24h</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Survival Cheat Sheet</div>
+    <div class="card">
+      <div class="phrase-row" style="background:#fef9f9;border-bottom:1px solid var(--border)">
+        <div><div class="phrase-jp">助けてください！</div><div class="phrase-romaji">Tasukete kudasai!</div></div>
+        <div class="phrase-right"><div class="phrase-en" style="color:var(--red);font-weight:700;">Help me, please!</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">すみません</div><div class="phrase-romaji">Sumimasen</div></div>
+        <div class="phrase-right"><div class="phrase-en">Excuse me / Sorry</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">ありがとう</div><div class="phrase-romaji">Arigatou</div></div>
+        <div class="phrase-right"><div class="phrase-en">Thank you</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">はい / いいえ</div><div class="phrase-romaji">Hai / Iie</div></div>
+        <div class="phrase-right"><div class="phrase-en">Yes / No</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">〇〇はどこですか</div><div class="phrase-romaji">XX wa doko desu ka</div></div>
+        <div class="phrase-right"><div class="phrase-en">Where is XX?</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">これはいくらですか</div><div class="phrase-romaji">Kore wa ikura desu ka</div></div>
+        <div class="phrase-right"><div class="phrase-en">How much is this?</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">お会計をお願いします</div><div class="phrase-romaji">O-kaikei o onegai shimasu</div></div>
+        <div class="phrase-right"><div class="phrase-en">Bill, please</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">お手洗いはどこですか</div><div class="phrase-romaji">O-tearai wa doko desu ka</div></div>
+        <div class="phrase-right"><div class="phrase-en">Where's the restroom?</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">わかりません</div><div class="phrase-romaji">Wakarimasen</div></div>
+        <div class="phrase-right"><div class="phrase-en">I don't understand</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">英語はわかりますか</div><div class="phrase-romaji">Eigo wa wakarimasu ka</div></div>
+        <div class="phrase-right"><div class="phrase-en">Do you speak English?</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">ごちそうさまでした</div><div class="phrase-romaji">Gochisousama deshita</div></div>
+        <div class="phrase-right"><div class="phrase-en">Thank you for the meal</div></div>
+      </div>
+      <div class="phrase-row">
+        <div><div class="phrase-jp">〇〇までお願いします</div><div class="phrase-romaji">XX made onegai shimasu</div></div>
+        <div class="phrase-right"><div class="phrase-en">To XX, please (taxi/train)</div></div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      💡 The Japanese deeply appreciate any effort to speak their language — even one phrase generates warm smiles and helpful responses. Don't be afraid to try!
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 2: WRITING SYSTEMS
+  ══════════════════════════════════════════ -->
+  <div id="tab-writing" class="tab-panel">
+    <div class="sub-tabs">
+      <button class="sub-tab-btn active" onclick="showSubTab('writing','overview')">Overview</button>
+      <button class="sub-tab-btn" onclick="showSubTab('writing','hiragana')">Hiragana</button>
+      <button class="sub-tab-btn" onclick="showSubTab('writing','katakana')">Katakana</button>
+      <button class="sub-tab-btn" onclick="showSubTab('writing','tips')">Tips</button>
+    </div>
+
+    <!-- Overview -->
+    <div id="writing-overview" class="sub-panel active">
+      <div class="section-label">Three Writing Systems</div>
+      <div class="card">
+        <div class="muted pad">Japanese uses three writing systems simultaneously — often in the same sentence. Understanding each one's role is essential.</div>
+        <table class="overview-table">
+          <thead><tr><th>System</th><th>Characters</th><th>When Used</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Hiragana</strong></td>
+              <td><span class="overview-jp">あいうえお</span></td>
+              <td>Native words, grammar particles, verb endings</td>
+            </tr>
+            <tr>
+              <td><strong>Katakana</strong></td>
+              <td><span class="overview-jp">アイウエオ</span></td>
+              <td>Foreign loan words, names, emphasis, onomatopoeia</td>
+            </tr>
+            <tr>
+              <td><strong>Kanji</strong></td>
+              <td><span class="overview-jp">山川田</span></td>
+              <td>Core nouns, verbs, adjectives. ~2,000 for daily use.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip-box">
+        💡 Example: <strong>食べる</strong> = kanji (食) + hiragana (べる) = "to eat" (taberu). All three systems appear in a single sentence naturally.
+      </div>
+    </div>
+
+    <!-- Hiragana -->
+    <div id="writing-hiragana" class="sub-panel">
+      <div class="section-label">Basic 46 Characters</div>
+      <p class="muted" style="padding:0 16px 8px;font-size:12px;">Hiragana is the foundation of Japanese literacy. Master this first — it's used in virtually every sentence.</p>
+      <div class="char-table-wrap">
+        <table class="char-table" id="hira-basic"></table>
+      </div>
+      <div class="section-label" style="margin-top:8px;">With Dakuten ゛ & Handakuten ゜</div>
+      <div class="char-table-wrap">
+        <table class="char-table" id="hira-daku"></table>
+      </div>
+    </div>
+
+    <!-- Katakana -->
+    <div id="writing-katakana" class="sub-panel">
+      <div class="section-label">Basic 46 Characters</div>
+      <p class="muted" style="padding:0 16px 8px;font-size:12px;">Katakana represents the same sounds as hiragana but for foreign words. Angular, sharp-looking characters.</p>
+      <div class="char-table-wrap">
+        <table class="char-table" id="kata-basic"></table>
+      </div>
+      <div class="section-label" style="margin-top:8px;">With Dakuten ゛ & Handakuten ゜</div>
+      <div class="char-table-wrap">
+        <table class="char-table" id="kata-daku"></table>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div id="writing-tips" class="sub-panel">
+      <div class="section-label">Common Confusions</div>
+      <div class="card">
+        <table class="confusion-table" id="confusion-table"></table>
+      </div>
+
+      <div class="section-label">Memorization Strategy</div>
+      <div class="week-card">
+        <div class="week-header">📅 Week 1 — Hiragana Vowels + K Row</div>
+        <div class="week-body">Start with <strong>あいうえお</strong> (a-i-u-e-o) and the K row (ka-ki-ku-ke-ko). These appear everywhere. Practice writing each 10 times daily.</div>
+      </div>
+      <div class="week-card">
+        <div class="week-header">📅 Week 2 — Complete Hiragana</div>
+        <div class="week-body">Add S, T, N, H, M, Y, R, W rows. Use flashcard apps (Anki, Duolingo) targeting 5 new characters/day. Focus on writing — muscle memory is the fastest path.</div>
+      </div>
+      <div class="week-card">
+        <div class="week-header">📅 Weeks 3–4 — Katakana</div>
+        <div class="week-body">Learn by pairing with foreign words you know: <strong>コーヒー</strong> (ko-hi-) = coffee, <strong>テレビ</strong> (terebi) = TV. Makes it instantly practical and memorable.</div>
+      </div>
+      <div class="week-card">
+        <div class="week-header">📅 Ongoing — Kanji</div>
+        <div class="week-body">Learn kanji in context (words), not isolation. Start with numbers <strong>一二三四五六七八九十</strong> and common words from the scenarios.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 3: ESSENTIAL PHRASES
+  ══════════════════════════════════════════ -->
+  <div id="tab-phrases" class="tab-panel">
+    <div class="sub-tabs">
+      <button class="sub-tab-btn active" onclick="showSubTab('phrases','top15')">Top 15</button>
+      <button class="sub-tab-btn" onclick="showSubTab('phrases','greetings')">Greetings</button>
+      <button class="sub-tab-btn" onclick="showSubTab('phrases','numbers')">Numbers</button>
+    </div>
+
+    <!-- Top 15 -->
+    <div id="phrases-top15" class="sub-panel active">
+      <p class="muted" style="padding:12px 16px 4px;font-size:12px;">Master these first. They work in virtually every situation and will instantly make you sound polite and capable.</p>
+      <div class="card">
+        <table class="phrase-table" id="top15-table"></table>
+      </div>
+    </div>
+
+    <!-- Greetings -->
+    <div id="phrases-greetings" class="sub-panel active" style="display:none">
+      <div class="card">
+        <table class="phrase-table" id="greetings-table"></table>
+      </div>
+    </div>
+
+    <!-- Numbers -->
+    <div id="phrases-numbers" class="sub-panel active" style="display:none">
+      <div class="section-label">Numbers</div>
+      <div class="card" style="padding:12px 16px;">
+        <div class="numbers-grid" id="numbers-grid"></div>
+      </div>
+      <div class="section-label" style="margin-top:4px;">Key Counters</div>
+      <div class="card">
+        <table class="phrase-table" id="counters-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       TAB 4: SCENARIOS
+  ══════════════════════════════════════════ -->
+  <div id="tab-scenarios" class="tab-panel">
+    <div class="search-bar">
+      <input type="search" class="search-input" id="scenario-search" placeholder="Search phrases..." oninput="filterScenarios(this.value)">
+    </div>
+    <div class="scenario-list" id="scenario-list"></div>
+    <div class="no-results" id="no-results">No phrases found. Try a different search.</div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showTab('home',this)">
+    <span class="nav-icon">⭐</span>Quick Ref
+  </button>
+  <button class="nav-btn" onclick="showTab('writing',this)">
+    <span class="nav-icon">✍️</span>Writing
+  </button>
+  <button class="nav-btn" onclick="showTab('phrases',this)">
+    <span class="nav-icon">💬</span>Phrases
+  </button>
+  <button class="nav-btn" onclick="showTab('scenarios',this)">
+    <span class="nav-icon">🗺️</span>Scenarios
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+
+const HIRA_BASIC = [
+  ['∅','あ','a','い','i','う','u','え','e','お','o'],
+  ['K','か','ka','き','ki','く','ku','け','ke','こ','ko'],
+  ['S','さ','sa','し','shi','す','su','せ','se','そ','so'],
+  ['T','た','ta','ち','chi','つ','tsu','て','te','と','to'],
+  ['N','な','na','に','ni','ぬ','nu','ね','ne','の','no'],
+  ['H','は','ha','ひ','hi','ふ','fu','へ','he','ほ','ho'],
+  ['M','ま','ma','み','mi','む','mu','め','me','も','mo'],
+  ['Y','や','ya','—','','ゆ','yu','—','','よ','yo'],
+  ['R','ら','ra','り','ri','る','ru','れ','re','ろ','ro'],
+  ['W','わ','wa','—','','—','','—','','を','wo'],
+  ['N','ん','n','—','','—','','—','','—',''],
+];
+
+const HIRA_DAKU = [
+  ['G','が','ga','ぎ','gi','ぐ','gu','げ','ge','ご','go'],
+  ['Z','ざ','za','じ','ji','ず','zu','ぜ','ze','ぞ','zo'],
+  ['D','だ','da','ぢ','ji*','づ','zu*','で','de','ど','do'],
+  ['B','ば','ba','び','bi','ぶ','bu','べ','be','ぼ','bo'],
+  ['P','ぱ','pa','ぴ','pi','ぷ','pu','ぺ','pe','ぽ','po'],
+];
+
+const KATA_BASIC = [
+  ['∅','ア','a','イ','i','ウ','u','エ','e','オ','o'],
+  ['K','カ','ka','キ','ki','ク','ku','ケ','ke','コ','ko'],
+  ['S','サ','sa','シ','shi','ス','su','セ','se','ソ','so'],
+  ['T','タ','ta','チ','chi','ツ','tsu','テ','te','ト','to'],
+  ['N','ナ','na','ニ','ni','ヌ','nu','ネ','ne','ノ','no'],
+  ['H','ハ','ha','ヒ','hi','フ','fu','ヘ','he','ホ','ho'],
+  ['M','マ','ma','ミ','mi','ム','mu','メ','me','モ','mo'],
+  ['Y','ヤ','ya','—','','ユ','yu','—','','ヨ','yo'],
+  ['R','ラ','ra','リ','ri','ル','ru','レ','re','ロ','ro'],
+  ['W','ワ','wa','—','','—','','—','','ヲ','wo'],
+  ['N','ン','n','—','','—','','—','','—',''],
+];
+
+const KATA_DAKU = [
+  ['G','ガ','ga','ギ','gi','グ','gu','ゲ','ge','ゴ','go'],
+  ['Z','ザ','za','ジ','ji','ズ','zu','ゼ','ze','ゾ','zo'],
+  ['D','ダ','da','ヂ','ji*','ヅ','zu*','デ','de','ド','do'],
+  ['B','バ','ba','ビ','bi','ブ','bu','ベ','be','ボ','bo'],
+  ['P','パ','pa','ピ','pi','プ','pu','ペ','pe','ポ','po'],
+];
+
+const CONFUSION = [
+  {sys:'Hiragana',tag:'tag-hira',chars:'ぬ vs ね',tip:'ぬ has a looping tail, ね has a cleaner exit. NU = noodle loop; NE = neat.'},
+  {sys:'Hiragana',tag:'tag-hira',chars:'め vs ぬ',tip:'め has an inward hook at the bottom. ME = eye-shaped; NU = noodle.'},
+  {sys:'Hiragana',tag:'tag-hira',chars:'は vs ほ',tip:'ほ has one more stroke (extra bar at top). HO = "more" letters.'},
+  {sys:'Hiragana',tag:'tag-hira',chars:'り vs い',tip:'り has a curve at the bottom of the second stroke. RI = river curve.'},
+  {sys:'Katakana',tag:'tag-kata',chars:'ア vs マ',tip:'ア has a diagonal top stroke going left; マ goes right. Different angles.'},
+  {sys:'Katakana',tag:'tag-kata',chars:'ソ vs ン',tip:'ソ strokes angle differently than ン. ソ = tilted forward; ン = pointing back.'},
+  {sys:'Katakana',tag:'tag-kata',chars:'シ vs ツ',tip:'Same confusion as ソ/ン but rotated. シ = horizontal; ツ = vertical.'},
+  {sys:'Katakana',tag:'tag-kata',chars:'ロ vs 口',tip:'ロ is perfectly rectangular; the kanji 口 has slightly angled corners in handwriting.'},
+  {sys:'Both',tag:'tag-both',chars:'は as particle',tip:'When は marks the topic of a sentence, pronounced "wa" not "ha". E.g., わたしは (watashi wa).'},
+  {sys:'Both',tag:'tag-both',chars:'へ as particle',tip:'When へ marks direction, pronounced "e" not "he". E.g., えきへ (eki e = to the station).'},
+  {sys:'Both',tag:'tag-both',chars:'を (wo)',tip:'Almost always pronounced "o" not "wo". Only used as a grammar particle, never to start words.'},
+];
+
+const TOP15 = [
+  {jp:'すみません',ro:'Sumimasen',en:'Excuse me / Sorry',note:'Most versatile phrase — get attention, apologize mildly, pass by'},
+  {jp:'ありがとうございます',ro:'Arigatou gozaimasu',en:'Thank you very much',note:'Polite/formal. Casual: ありがとう (arigatou)'},
+  {jp:'はい / いいえ',ro:'Hai / Iie',en:'Yes / No',note:'はい also used as acknowledgment ("I see", "understood")'},
+  {jp:'わかりました',ro:'Wakarimashita',en:'I understand / Got it'},
+  {jp:'わかりません',ro:'Wakarimasen',en:"I don't understand"},
+  {jp:'もう一度お願いします',ro:'Mou ichido onegai shimasu',en:'Please say that again',note:'Essential when you miss something'},
+  {jp:'ゆっくり話してください',ro:'Yukkuri hanashite kudasai',en:'Please speak slowly',note:'Very helpful for beginners'},
+  {jp:'英語はわかりますか？',ro:'Eigo wa wakarimasu ka?',en:'Do you understand English?'},
+  {jp:'どうぞ',ro:'Douzo',en:'Please / Go ahead / Here you go',note:'Said when handing something, offering a seat'},
+  {jp:'どうも',ro:'Doumo',en:'Thanks / Excuse me (informal)',note:'Casual, very versatile filler word'},
+  {jp:'お願いします',ro:'Onegai shimasu',en:'Please (request)',note:'More polite than ください; use when making requests'},
+  {jp:'ください',ro:'Kudasai',en:'Please give me / Please do',note:'Attach after a noun or verb stem'},
+  {jp:'〇〇はどこですか？',ro:'Sumimasen, XX wa doko desu ka?',en:'Excuse me, where is ~?',note:'Essential direction question'},
+  {jp:'いくらですか？',ro:'Ikura desu ka?',en:'How much is it?'},
+  {jp:'これをください',ro:'Kore o kudasai',en:"I'll have this / Please give me this",note:'Point and say this at counters'},
+];
+
+const GREETINGS = [
+  {jp:'おはようございます',ro:'Ohayou gozaimasu',en:'Good morning (polite)',note:'Until about 10–11 AM; casual: おはよう'},
+  {jp:'こんにちは',ro:'Konnichiwa',en:'Hello / Good afternoon',note:'Late morning–evening'},
+  {jp:'こんばんは',ro:'Konbanwa',en:'Good evening'},
+  {jp:'はじめまして',ro:'Hajimemashite',en:'Nice to meet you (first meeting)'},
+  {jp:'よろしくお願いします',ro:'Yoroshiku onegai shimasu',en:'Pleased to meet you / Best regards',note:'Said after introduction; deeply cultural'},
+  {jp:'お元気ですか？',ro:'O-genki desu ka?',en:'How are you?'},
+  {jp:'おかげさまで元気です',ro:'Okage-sama de genki desu',en:"I'm doing well, thank you",note:'Polite response to "how are you"'},
+  {jp:'またね / またあとで',ro:'Mata ne / Mata ato de',en:'See you / See you later',note:'Casual farewell'},
+  {jp:'さようなら',ro:'Sayounara',en:'Goodbye (formal, final)',note:'Use sparingly — implies a long separation'},
+  {jp:'いってきます',ro:'Ittekimasu',en:"I'm heading out",note:'Said when leaving home'},
+  {jp:'いってらっしゃい',ro:'Itterasshai',en:'Take care (said to someone leaving)',note:'Response to いってきます'},
+  {jp:'ただいま',ro:'Tadaima',en:"I'm home"},
+  {jp:'おかえり',ro:'Okaeri',en:'Welcome back',note:'Response to ただいま'},
+];
+
+const NUMBERS = [
+  {jp:'一（いち）',ro:'ichi',en:'1'},
+  {jp:'二（に）',ro:'ni',en:'2'},
+  {jp:'三（さん）',ro:'san',en:'3'},
+  {jp:'四（よん/し）',ro:'yon/shi',en:'4'},
+  {jp:'五（ご）',ro:'go',en:'5'},
+  {jp:'六（ろく）',ro:'roku',en:'6'},
+  {jp:'七（なな/しち）',ro:'nana/shichi',en:'7'},
+  {jp:'八（はち）',ro:'hachi',en:'8'},
+  {jp:'九（きゅう/く）',ro:'kyuu/ku',en:'9'},
+  {jp:'十（じゅう）',ro:'juu',en:'10'},
+  {jp:'百（ひゃく）',ro:'hyaku',en:'100'},
+  {jp:'千（せん）',ro:'sen',en:'1,000'},
+  {jp:'万（まん）',ro:'man',en:'10,000'},
+];
+
+const COUNTERS = [
+  {jp:'〇時（じ）',ro:'XX-ji',en:"XX o'clock"},
+  {jp:'〇分（ふん/ぷん）',ro:'XX-fun/pun',en:'XX minutes',note:'ふん or ぷん depending on the number before it'},
+];
+
+const SCENARIOS = [
+  {
+    id:'3.1', emoji:'🍽️', title:'Restaurant — Reservations & Wait Time',
+    tip:'Restaurants range from counter omakase to ramen shops with vending machine ordering.',
+    phrases:[
+      {jp:'予約したいのですが',ro:'Yoyaku shitai no desu ga',en:"I'd like to make a reservation"},
+      {jp:'〇〇日、〇時に〇名で予約できますか？',ro:'Mikka, roku-ji ni san-mei de yoyaku dekimasu ka?',en:'Can I book for [date], [time], [# people]?'},
+      {jp:'二名でお願いします',ro:'Futari de onegai shimasu',en:'For 2 people, please'},
+      {jp:'何時まで営業していますか？',ro:'Nanji made eigyou shite imasu ka?',en:'Until what time are you open?'},
+      {jp:'禁煙席をお願いします',ro:'Kinen-seki o onegai shimasu',en:'Non-smoking seat, please'},
+      {jp:'窓際の席をお願いします',ro:'Madogiwa no seki o onegai shimasu',en:'A window seat, please'},
+      {jp:'〇〇という名前で予約しています',ro:'XX to iu namae de yoyaku shite imasu',en:'I have a reservation under the name XX'},
+      {jp:'何名様ですか？',ro:'Nan-mei-sama desu ka?',en:'How many people? (staff asking you)'},
+      {jp:'ただいま満席です',ro:'Tadaima manseki desu',en:"We're currently full (staff)"},
+      {jp:'どのくらい待ちますか？',ro:'Dono kurai machimasu ka?',en:'How long is the wait?'},
+      {jp:'〇〇分ほどお待ちください',ro:'XX-fun hodo omachi kudasai',en:'Please wait about XX minutes (staff)'},
+      {jp:'番号をお呼びします',ro:'Bangou o oyobi shimasu',en:"We'll call your number (staff)"},
+    ]
+  },
+  {
+    id:'3.2', emoji:'🍜', title:'Restaurant — Ordering Food & Drinks',
+    tip:'',
+    phrases:[
+      {jp:'メニューをください',ro:'Menyu- o kudasai',en:'Menu, please'},
+      {jp:'これをください / これをひとつ',ro:'Kore o kudasai / Kore o hitotsu',en:'This one, please / One of this'},
+      {jp:'おすすめは何ですか？',ro:'Osusume wa nan desu ka?',en:'What do you recommend?'},
+      {jp:'〇〇はありますか？',ro:'XX wa arimasu ka?',en:'Do you have XX?'},
+      {jp:'〇〇をひとつ／ふたつお願いします',ro:'XX o hitotsu / futatsu onegai shimasu',en:'One / Two of XX, please'},
+      {jp:'〇〇抜きでお願いします',ro:'XX nuki de onegai shimasu',en:'Please leave out XX (allergy/preference)'},
+      {jp:'辛いですか？',ro:'Karai desu ka?',en:'Is it spicy?'},
+      {jp:'アレルギーがあります。〇〇は入っていますか？',ro:'Are-rugi- ga arimasu. XX wa haitte imasu ka?',en:'I have an allergy. Does it contain XX?'},
+      {jp:'ご注文はお決まりですか？',ro:'Go-chuumon wa okimari desu ka?',en:'Are you ready to order? (staff)'},
+      {jp:'少々お待ちください',ro:'Shoushou omachi kudasai',en:'Please wait a moment (staff)'},
+      {jp:'同じものをください',ro:'Onaji mono o kudasai',en:'The same thing, please'},
+      {jp:'ライスをもう一杯ください',ro:'Raisu o mou ippai kudasai',en:'One more bowl of rice, please'},
+      {jp:'〇〇のセットをお願いします',ro:'XX no setto o onegai shimasu',en:'The XX set meal, please'},
+      {jp:'飲み物は何がありますか？',ro:'Nomimono wa nani ga arimasu ka?',en:'What drinks do you have?'},
+      {jp:'お水をください',ro:'O-mizu o kudasai',en:'Water, please'},
+      {jp:'おかわりをください',ro:'Okawari o kudasai',en:'Refill, please'},
+    ]
+  },
+  {
+    id:'3.3', emoji:'💴', title:'Restaurant — Payment & Leaving',
+    tip:'To get a server\'s attention, say すみません — never wave or snap fingers. Always say ごちそうさまでした when leaving.',
+    phrases:[
+      {jp:'お手洗いはどこですか？',ro:'O-tearai wa doko desu ka?',en:'Where is the restroom?'},
+      {jp:'お会計をお願いします',ro:'O-kaikei o onegai shimasu',en:'Check / Bill, please'},
+      {jp:'お箸をください',ro:'O-hashi o kudasai',en:'Chopsticks, please'},
+      {jp:'フォークをください',ro:'Fo-ku o kudasai',en:'Fork, please'},
+      {jp:'ナプキンをください',ro:'Napukin o kudasai',en:'Napkin, please'},
+      {jp:'こぼしてしまいました',ro:'Koboshite shimaimashita',en:'I spilled something'},
+      {jp:'別々に払えますか？',ro:'Betsubetsu ni haraemasu ka?',en:'Can we pay separately?'},
+      {jp:'カードで払えますか？',ro:'Ka-do de haraemasu ka?',en:'Can I pay by card?'},
+      {jp:'現金のみです',ro:'Genkin nomi desu',en:'Cash only (staff)'},
+      {jp:'領収書をください',ro:'Ryoushuusho o kudasai',en:'Receipt, please'},
+      {jp:'消費税は含まれていますか？',ro:'Shouhizei wa fukumarete imasu ka?',en:'Is tax included?'},
+      {jp:'ごちそうさまでした',ro:'Gochisousama deshita',en:'Thank you for the meal (said after eating)'},
+      {jp:'おいしかったです',ro:'Oishikatta desu',en:'It was delicious'},
+      {jp:'もう少しください',ro:'Mou sukoshi kudasai',en:'A little more, please'},
+      {jp:'お持ち帰りできますか？',ro:'O-mochikaeri dekimasu ka?',en:'Can I take this to go?'},
+    ]
+  },
+  {
+    id:'3.4', emoji:'🏮', title:'Street Food & Markets',
+    tip:'',
+    phrases:[
+      {jp:'〇〇はいくらですか？',ro:'XX wa ikura desu ka?',en:'How much is XX?'},
+      {jp:'試食できますか？',ro:'Shishoku dekimasu ka?',en:'Can I try a sample?'},
+      {jp:'一つください',ro:'Hitotsu kudasai',en:'One, please'},
+      {jp:'おいしそうですね',ro:'Oishisou desu ne',en:'That looks delicious'},
+      {jp:'どうやって食べますか？',ro:'Dou yatte tabemasu ka?',en:'How do you eat this?'},
+      {jp:'辛いですか？甘いですか？',ro:'Karai desu ka? Amai desu ka?',en:'Is it spicy? Is it sweet?'},
+      {jp:'袋をもらえますか？',ro:'Fukuro o moraemasu ka?',en:'Can I get a bag?'},
+      {jp:'まとめていくらですか？',ro:'Matomete ikura desu ka?',en:'How much for all of them together?'},
+      {jp:'少し安くなりますか？',ro:'Sukoshi yasuku narimasu ka?',en:'Can you make it a little cheaper?'},
+      {jp:'これは何という食べ物ですか？',ro:'Kore wa nan to iu tabemono desu ka?',en:'What is this food called?'},
+      {jp:'おすすめはどれですか？',ro:'Osusume wa dore desu ka?',en:'Which one do you recommend?'},
+      {jp:'温めてもらえますか？',ro:'Atatamete moraemasu ka?',en:'Could you warm it up for me?'},
+    ]
+  },
+  {
+    id:'3.5', emoji:'✈️', title:'Airport',
+    tip:"Japan's major airports (Narita, Haneda, Kansai) have extensive English signage, but these help at customs, immigration, and less-traveled areas.",
+    phrases:[
+      {jp:'チェックインはどこですか？',ro:'Chekku-in wa doko desu ka?',en:'Where is check-in?'},
+      {jp:'〇〇航空のカウンターはどこですか？',ro:'XX koukou no kaunta- wa doko desu ka?',en:'Where is the XX airline counter?'},
+      {jp:'パスポートを見せてください',ro:'Pasupōto o misete kudasai',en:'Please show your passport (staff)'},
+      {jp:'こちらが私のパスポートです',ro:'Kochira ga watashi no pasupōto desu',en:'Here is my passport'},
+      {jp:'荷物を預けたいです',ro:'Nimotsu o azuketai desu',en:"I'd like to check my luggage"},
+      {jp:'手荷物を機内に持ち込めますか？',ro:'Tenimotsu o kinai ni mochikomemasu ka?',en:'Can I bring this carry-on onboard?'},
+      {jp:'搭乗口はどこですか？',ro:'Toujouguchi wa doko desu ka?',en:'Where is the boarding gate?'},
+      {jp:'搭乗はいつですか？',ro:'Toujou wa itsu desu ka?',en:'When is boarding?'},
+      {jp:'フライトが遅れています',ro:'Furaito ga okurete imasu',en:'The flight is delayed'},
+      {jp:'税関はどこですか？',ro:'Zeikan wa doko desu ka?',en:'Where is customs?'},
+      {jp:'申告するものはありますか？',ro:'Shinkoku suru mono wa arimasu ka?',en:'Do you have anything to declare? (customs)'},
+      {jp:'申告するものはありません',ro:'Shinkoku suru mono wa arimasen',en:'Nothing to declare'},
+      {jp:'入国の目的は何ですか？',ro:'Nyuukoku no mokuteki wa nan desu ka?',en:'What is the purpose of your visit?'},
+      {jp:'観光です',ro:'Kankou desu',en:'Sightseeing / Tourism'},
+      {jp:'〇泊する予定です',ro:'XX-haku suru yotei desu',en:'I plan to stay for XX nights'},
+      {jp:'荷物が出てきません',ro:'Nimotsu ga dete kimasen',en:"My luggage hasn't come out"},
+      {jp:'手荷物受取所はどこですか？',ro:'Tenimotsu uketori-jo wa doko desu ka?',en:'Where is baggage claim?'},
+      {jp:'両替所はどこですか？',ro:'Ryougaejo wa doko desu ka?',en:'Where is the currency exchange?'},
+      {jp:'空港バスはどこから乗れますか？',ro:'Kuukou basu wa doko kara noremasu ka?',en:'Where do I catch the airport bus?'},
+      {jp:'Wifiはありますか？',ro:'WiFi wa arimasu ka?',en:'Is there WiFi?'},
+    ]
+  },
+  {
+    id:'3.6', emoji:'🚕', title:'Taxi & Ride-Sharing',
+    tip:'Japanese taxis are metered and reliable. Doors open automatically — never touch them! Many drivers don\'t speak English. Show addresses on your phone.',
+    phrases:[
+      {jp:'〇〇までお願いします',ro:'XX made onegai shimasu',en:'To XX, please'},
+      {jp:'このホテルまでお願いします',ro:'Kono hoteru made onegai shimasu',en:'To this hotel, please'},
+      {jp:'この住所まで行ってください',ro:'Kono juusho made itte kudasai',en:'Please go to this address'},
+      {jp:'いくらかかりますか？',ro:'Ikura kakarimasu ka?',en:'How much will it cost?'},
+      {jp:'メーターをつけてください',ro:'Me-ta- o tsukete kudasai',en:'Please use the meter'},
+      {jp:'ここで止めてください',ro:'Koko de tomete kudasai',en:'Please stop here'},
+      {jp:'まっすぐ行ってください',ro:'Massugu itte kudasai',en:'Go straight, please'},
+      {jp:'右に曲がってください',ro:'Migi ni magatte kudasai',en:'Turn right, please'},
+      {jp:'左に曲がってください',ro:'Hidari ni magatte kudasai',en:'Turn left, please'},
+      {jp:'急いでください',ro:'Isoide kudasai',en:'Please hurry'},
+      {jp:'急がなくていいです',ro:'Isoganakute ii desu',en:'No rush / Take your time'},
+      {jp:'トランクに入れてください',ro:'Toranku ni irete kudasai',en:'Please put it in the trunk'},
+      {jp:'お釣りはいりません',ro:'O-tsuri wa irimasen',en:'Keep the change'},
+      {jp:'レシートをください',ro:'Reshiito o kudasai',en:'Receipt, please'},
+      {jp:'クレジットカードは使えますか？',ro:'Kurejitto kādo wa tsukaemasu ka?',en:'Can I pay by credit card?'},
+      {jp:'Uberを呼びたいです',ro:'Ūbā o yobitai desu',en:"I'd like to call an Uber"},
+      {jp:'大体どのくらいかかりますか？',ro:'Daitai dono kurai kakarimasu ka?',en:'Approximately how long will it take?'},
+    ]
+  },
+  {
+    id:'3.7', emoji:'🚄', title:'Train & Subway',
+    tip:"Japan's train network is the world's best. Get a Suica or Pasmo IC card for seamless travel. Stay quiet, no phone calls, priority seats for elderly/pregnant/disabled.",
+    phrases:[
+      {jp:'〇〇行きの電車はどこから乗れますか？',ro:'XX-yuki no densha wa doko kara noremasu ka?',en:'Where do I catch the train to XX?'},
+      {jp:'〇〇までいくらですか？',ro:'XX made ikura desu ka?',en:'How much to XX?'},
+      {jp:'〇〇まで一枚ください',ro:'XX made ichimai kudasai',en:'One ticket to XX, please'},
+      {jp:'この電車は〇〇に止まりますか？',ro:'Kono densha wa XX ni tomarimasu ka?',en:'Does this train stop at XX?'},
+      {jp:'〇〇駅はどこですか？',ro:'XX-eki wa doko desu ka?',en:'Where is XX Station?'},
+      {jp:'次は〇〇駅です',ro:'Tsugi wa XX-eki desu',en:'The next stop is XX Station (announcement)'},
+      {jp:'乗り換えが必要ですか？',ro:'Norikae ga hitsuyou desu ka?',en:'Do I need to transfer?'},
+      {jp:'〇〇線に乗り換えるにはどこですか？',ro:'XX-sen ni norikaeru ni wa doko desu ka?',en:'Where do I transfer to the XX Line?'},
+      {jp:'自由席はありますか？',ro:'Jiyuuseki wa arimasu ka?',en:'Are there unreserved seats?'},
+      {jp:'指定席をお願いします',ro:'Shiteiseki o onegai shimasu',en:'Reserved seat, please'},
+      {jp:'新幹線のチケットをください',ro:'Shinkansen no chiketto o kudasai',en:'A bullet train ticket, please'},
+      {jp:'ICカードを使えますか？',ro:'IC kādo o tsukaemasu ka?',en:'Can I use an IC card?'},
+      {jp:'終電は何時ですか？',ro:'Shuuden wa nanji desu ka?',en:'What time is the last train?'},
+      {jp:'出口はどこですか？',ro:'Deguchi wa doko desu ka?',en:'Where is the exit?'},
+      {jp:'改札はどこですか？',ro:'Kaisatsu wa doko desu ka?',en:'Where are the ticket gates?'},
+      {jp:'電車が遅れています',ro:'Densha ga okurete imasu',en:'The train is delayed'},
+    ]
+  },
+  {
+    id:'3.8', emoji:'🗺️', title:'Asking for Directions',
+    tip:'',
+    phrases:[
+      {jp:'〇〇はどこですか？',ro:'XX wa doko desu ka?',en:'Where is XX?'},
+      {jp:'〇〇へはどうやって行きますか？',ro:'XX e wa dou yatte ikimasu ka?',en:'How do I get to XX?'},
+      {jp:'まっすぐ行ってください',ro:'Massugu itte kudasai',en:'Go straight'},
+      {jp:'右に曲がってください',ro:'Migi ni magatte kudasai',en:'Turn right'},
+      {jp:'左に曲がってください',ro:'Hidari ni magatte kudasai',en:'Turn left'},
+      {jp:'〇〇の隣です',ro:'XX no tonari desu',en:"It's next to XX"},
+      {jp:'〇〇の前です',ro:'XX no mae desu',en:"It's in front of XX"},
+      {jp:'〇〇の後ろです',ro:'XX no ushiro desu',en:"It's behind XX"},
+      {jp:'そこから歩いて何分ですか？',ro:'Soko kara aruite nan-pun desu ka?',en:'How many minutes on foot from there?'},
+      {jp:'〇〇分歩きます',ro:'XX-fun arukimasu',en:'Walk for XX minutes'},
+      {jp:'この地図で教えてください',ro:'Kono chizu de oshiete kudasai',en:'Please show me on this map'},
+      {jp:'道に迷いました',ro:'Michi ni mayoimashita',en:"I'm lost"},
+      {jp:'ここはどこですか？',ro:'Koko wa doko desu ka?',en:'Where are we? / Where is this?'},
+    ]
+  },
+  {
+    id:'3.9', emoji:'🛍️', title:'Shopping — Stores & Tax-Free',
+    tip:'Tourists spending ¥5,000+ at qualifying stores can request tax-free (免税/menzei). Bring your passport. Consumption tax (消費税) is 10%.',
+    phrases:[
+      {jp:'〇〇はありますか？',ro:'XX wa arimasu ka?',en:'Do you have XX?'},
+      {jp:'これはいくらですか？',ro:'Kore wa ikura desu ka?',en:'How much is this?'},
+      {jp:'ちょっと見てもいいですか？',ro:'Chotto mite mo ii desu ka?',en:'Can I take a look?'},
+      {jp:'試着してもいいですか？',ro:'Shichaku shite mo ii desu ka?',en:'Can I try this on?'},
+      {jp:'別のサイズはありますか？',ro:'Betsu no saizu wa arimasu ka?',en:'Do you have another size?'},
+      {jp:'別の色はありますか？',ro:'Betsu no iro wa arimasu ka?',en:'Do you have another color?'},
+      {jp:'これをください',ro:'Kore o kudasai',en:"I'll take this one"},
+      {jp:'袋をもらえますか？',ro:'Fukuro o moraemasu ka?',en:'Can I get a bag?'},
+      {jp:'セールはしていますか？',ro:'Se-ru wa shite imasu ka?',en:'Is there a sale?'},
+      {jp:'割引はありますか？',ro:'Waribiki wa arimasu ka?',en:'Is there a discount?'},
+      {jp:'免税はできますか？',ro:'Menzei wa dekimasu ka?',en:'Can I get tax-free?'},
+      {jp:'免税のカウンターはどこですか？',ro:'Menzei no kaunta- wa doko desu ka?',en:'Where is the tax-free counter?'},
+      {jp:'返品できますか？',ro:'Henpin dekimasu ka?',en:'Can I return this?'},
+      {jp:'交換できますか？',ro:'Koukan dekimasu ka?',en:'Can I exchange this?'},
+      {jp:'ポイントカードはありますか？',ro:'Pointo kādo wa arimasu ka?',en:'Do you have a points card?'},
+      {jp:'カードで払えますか？',ro:'Kādo de haraemasu ka?',en:'Can I pay by card?'},
+      {jp:'PayPayは使えますか？',ro:'PayPay wa tsukaemasu ka?',en:'Can I use PayPay?'},
+      {jp:'在庫はありますか？',ro:'Zaiko wa arimasu ka?',en:'Is it in stock?'},
+      {jp:'ラッピングしてもらえますか？',ro:'Rappingu shite moraemasu ka?',en:'Can you gift-wrap this?'},
+      {jp:'領収書をください',ro:'Ryoushuusho o kudasai',en:'Receipt, please'},
+    ]
+  },
+  {
+    id:'3.10', emoji:'🏨', title:'Hotel — Check-In & Requests',
+    tip:'',
+    phrases:[
+      {jp:'チェックインをお願いします',ro:'Chekku-in o onegai shimasu',en:'Check-in, please'},
+      {jp:'〇〇という名前で予約しています',ro:'XX to iu namae de yoyaku shite imasu',en:'I have a reservation under the name XX'},
+      {jp:'チェックアウトは何時ですか？',ro:'Chekku-auto wa nanji desu ka?',en:'What time is check-out?'},
+      {jp:'チェックアウトをお願いします',ro:'Chekku-auto o onegai shimasu',en:'Check-out, please'},
+      {jp:'部屋の鍵をください',ro:'Heya no kagi o kudasai',en:'Room key, please'},
+      {jp:'鍵をなくしてしまいました',ro:'Kagi o nakushite shimaimashita',en:'I lost my key'},
+      {jp:'Wi-Fiのパスワードを教えてください',ro:'Wi-Fi no pasuwa-do o oshiete kudasai',en:'Please tell me the Wi-Fi password'},
+      {jp:'部屋のエアコンが動きません',ro:'Heya no eakon ga ugokimasen',en:"The air conditioner doesn't work"},
+      {jp:'タオルをもっとください',ro:'Taoru o motto kudasai',en:'More towels, please'},
+      {jp:'モーニングコールをお願いします',ro:'Mo-ningu ko-ru o onegai shimasu',en:'Wake-up call, please'},
+      {jp:'朝食はどこですか？',ro:'Choushoku wa doko desu ka?',en:'Where is breakfast?'},
+      {jp:'荷物を預かってもらえますか？',ro:'Nimotsu o azukatte moraemasu ka?',en:'Can you hold my luggage?'},
+      {jp:'おすすめのレストランを教えてください',ro:'Osusume no resutoran o oshiete kudasai',en:'Please recommend a restaurant'},
+      {jp:'タクシーを呼んでもらえますか？',ro:'Takushi- o yonde moraemasu ka?',en:'Could you call a taxi for me?'},
+      {jp:'禁煙室をお願いします',ro:'Kinen-shitsu o onegai shimasu',en:'Non-smoking room, please'},
+      {jp:'アーリーチェックインできますか？',ro:'A-ri- chekku-in dekimasu ka?',en:'Can I check in early?'},
+      {jp:'レイトチェックアウトをお願いします',ro:'Reito chekku-auto o onegai shimasu',en:'Late check-out, please'},
+      {jp:'部屋を掃除しないでください',ro:'Heya o souji shinai de kudasai',en:'Please do not clean the room'},
+    ]
+  },
+  {
+    id:'3.11', emoji:'⛩️', title:'Temples & Shrines',
+    tip:'Japan has 80,000+ Buddhist temples (お寺) and 100,000+ Shinto shrines (神社). Bow at the gate, purify hands at the water basin (手水舎), speak quietly.',
+    phrases:[
+      {jp:'拝観料はいくらですか？',ro:'Haikanryou wa ikura desu ka?',en:'How much is the admission fee?'},
+      {jp:'拝観時間は何時までですか？',ro:'Haikan jikan wa nanji made desu ka?',en:'Until what time can I visit?'},
+      {jp:'写真を撮ってもいいですか？',ro:'Shashin o totte mo ii desu ka?',en:'May I take photos?'},
+      {jp:'これは何という建物ですか？',ro:'Kore wa nan to iu tatemono desu ka?',en:'What is this building called?'},
+      {jp:'おみくじを引いてもいいですか？',ro:'Omikuji o hiite mo ii desu ka?',en:'May I draw a fortune slip?'},
+      {jp:'御朱印をいただけますか？',ro:'Goshuin o itadakemasu ka?',en:'May I receive a temple/shrine stamp?'},
+      {jp:'お守りをください',ro:'O-mamori o kudasai',en:"I'd like a lucky charm, please"},
+      {jp:'このお守りはどんな意味ですか？',ro:'Kono o-mamori wa donna imi desu ka?',en:'What does this charm mean?'},
+      {jp:'英語のパンフレットはありますか？',ro:'Eigo no panfuretto wa arimasu ka?',en:'Do you have an English pamphlet?'},
+      {jp:'静かにしてください',ro:'Shizuka ni shite kudasai',en:'Please be quiet (sign/reminder)'},
+      {jp:'土足禁止です',ro:'Dosoku kinshi desu',en:'No shoes — remove footwear (sign)'},
+      {jp:'お参りのやり方を教えてください',ro:'O-mairi no yarikata o oshiete kudasai',en:'Please teach me how to pray here'},
+    ]
+  },
+  {
+    id:'3.12', emoji:'🚗', title:'Driving, Parking & Directions',
+    tip:'Japan drives on the LEFT. Speed limits strictly enforced (general roads: 60 km/h, highways: 100 km/h). ETC cards for toll roads highly recommended.',
+    phrases:[
+      {jp:'駐車場はどこですか？',ro:'Chuushajou wa doko desu ka?',en:'Where is the parking lot?'},
+      {jp:'駐車してもいいですか？',ro:'Chuusha shite mo ii desu ka?',en:'Can I park here?'},
+      {jp:'駐車料金はいくらですか？',ro:'Chuusha ryoukin wa ikura desu ka?',en:'How much is parking?'},
+      {jp:'満車です',ro:'Mansha desu',en:'Parking lot is full (sign)'},
+      {jp:'ガソリンスタンドはどこですか？',ro:'Gasorin sutando wa doko desu ka?',en:'Where is the gas station?'},
+      {jp:'満タンにしてください',ro:'Mantan ni shite kudasai',en:'Fill it up, please'},
+      {jp:'レギュラーをお願いします',ro:'Regyura- o onegai shimasu',en:'Regular (gas), please'},
+      {jp:'道路工事があります',ro:'Dourou kouji ga arimasu',en:'There is road construction'},
+      {jp:'Uターン禁止',ro:'U-ta-n kinshi',en:'No U-turn (sign)'},
+      {jp:'一方通行',ro:'Ippou tsuukou',en:'One-way street (sign)'},
+      {jp:'速度制限は何キロですか？',ro:'Sokudo seigen wa nan kiro desu ka?',en:'What is the speed limit?'},
+      {jp:'事故がありました',ro:'Jiko ga arimashita',en:'There was an accident'},
+      {jp:'レンタカーを返したいです',ro:'Renta-ka- o kaeshitai desu',en:"I'd like to return the rental car"},
+      {jp:'右折 / 左折',ro:'Usetsu / Sasetsu',en:'Right turn / Left turn (sign)'},
+      {jp:'目的地まであと何キロですか？',ro:'Mokutekichi made ato nan kiro desu ka?',en:'How many km to the destination?'},
+    ]
+  },
+  {
+    id:'3.13', emoji:'🙏', title:'Favors, Appreciation & Apologies',
+    tip:'Japanese culture places enormous value on gratitude and apology. The difference between すみません and 申し訳ありません is significant — save the latter for serious situations.',
+    phrases:[
+      {jp:'ありがとうございます',ro:'Arigatou gozaimasu',en:'Thank you very much (polite)'},
+      {jp:'どうもありがとうございました',ro:'Doumo arigatou gozaimashita',en:'Thank you very much (past, very polite)',note:'Use after someone has done something for you'},
+      {jp:'お世話になりました',ro:'O-sewa ni narimashita',en:'Thank you for your help / care',note:'Very polite; common in professional settings'},
+      {jp:'ご親切にありがとうございます',ro:'Go-shinsetsu ni arigatou gozaimasu',en:'Thank you for your kindness'},
+      {jp:'おかげさまで',ro:'Okage-sama de',en:'Thanks to you / Thankfully'},
+      {jp:'すみません',ro:'Sumimasen',en:"Excuse me / I'm sorry (mild)",note:'Also used to get attention or apologize lightly'},
+      {jp:'ごめんなさい',ro:'Gomen nasai',en:"I'm sorry (sincere apology)",note:'More personal/emotional than すみません'},
+      {jp:'申し訳ありません',ro:'Moushiwake arimasen',en:"I'm deeply sorry (very formal/sincere)",note:'Strongest apology; business or serious situations'},
+      {jp:'失礼しました',ro:'Shitsurei shimashita',en:'I was rude / Excuse me (formal)',note:"Used when you've made a mistake in formal situations"},
+      {jp:'大丈夫です',ro:'Daijoubu desu',en:"It's okay / No problem"},
+      {jp:'気にしないでください',ro:'Ki ni shinai de kudasai',en:"Please don't worry about it"},
+      {jp:'お願いがあります',ro:'O-negai ga arimasu',en:'I have a favor to ask'},
+      {jp:'〇〇していただけますか？',ro:'XX shite itadakemasu ka?',en:'Could you please do XX for me?',note:'Most polite way to make a request'},
+      {jp:'〇〇してもらえますか？',ro:'XX shite moraemasu ka?',en:'Could you do XX for me? (polite)'},
+      {jp:'お手伝いしましょうか？',ro:'O-tetsudai shimashou ka?',en:'Shall I help you?'},
+      {jp:'助かります',ro:'Tasukarimasu',en:'That would be a great help'},
+      {jp:'よかった',ro:'Yokatta',en:"I'm glad / That's great"},
+      {jp:'気をつけてください',ro:'Ki o tsukete kudasai',en:'Please take care / Be careful'},
+      {jp:'どういたしまして',ro:'Dou itashimashite',en:"You're welcome"},
+      {jp:'いつもお世話になっています',ro:'Itsumo o-sewa ni natte imasu',en:'Thank you always for your support',note:'Very common business phrase'},
+    ]
+  },
+  {
+    id:'3.14', emoji:'🚨', title:'Emergency Phrases',
+    tip:'Police: 110 | Ambulance/Fire: 119 | Tourist Hotline: 050-3816-2787 (24h, English available)',
+    emergency: true,
+    phrases:[
+      {jp:'助けてください！',ro:'Tasukete kudasai!',en:'Help me, please!'},
+      {jp:'警察を呼んでください',ro:'Keisatsu o yonde kudasai',en:'Please call the police'},
+      {jp:'救急車を呼んでください',ro:'Kyuukyuusha o yonde kudasai',en:'Please call an ambulance'},
+      {jp:'火事です！',ro:'Kaji desu!',en:'Fire!'},
+      {jp:'どろぼうです！',ro:'Dorobou desu!',en:'Thief! / Robbery!'},
+      {jp:'迷子になりました',ro:'Maigo ni narimashita',en:"I'm lost"},
+      {jp:'財布をなくしました',ro:'Saifu o nakushimashita',en:'I lost my wallet'},
+      {jp:'パスポートをなくしました',ro:'Pasupōto o nakushimashita',en:'I lost my passport'},
+      {jp:'病院に行きたいです',ro:'Byouin ni ikitai desu',en:"I'd like to go to a hospital"},
+      {jp:'気分が悪いです',ro:'Kibun ga warui desu',en:'I feel sick / unwell'},
+      {jp:'アレルギーがあります',ro:'Are-rugi- ga arimasu',en:'I have an allergy'},
+      {jp:'薬をください',ro:'Kusuri o kudasai',en:'Please give me medicine'},
+      {jp:'日本語があまり話せません',ro:'Nihongo ga amari hanasemasen',en:"I can't speak Japanese well"},
+      {jp:'大使館に連絡してください',ro:'Taishikan ni renraku shite kudasai',en:'Please contact the embassy'},
+      {jp:'ここは安全ですか？',ro:'Koko wa anzen desu ka?',en:'Is it safe here?'},
+    ]
+  },
+];
+
+// ═══════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════
+
+function buildCharTable(tableId, data) {
+  const t = document.getElementById(tableId);
+  let html = '<thead><tr><th></th><th>a</th><th>i</th><th>u</th><th>e</th><th>o</th></tr></thead><tbody>';
+  data.forEach(row => {
+    html += '<tr>';
+    html += `<td class="char-table row-label">${row[0]}</td>`;
+    for (let i = 1; i < 11; i += 2) {
+      const ch = row[i], ro = row[i+1];
+      if (!ch || ch === '—') {
+        html += `<td><span class="char-empty">—</span></td>`;
+      } else {
+        html += `<td><div class="char-cell"><span class="char-jp">${ch}</span><span class="char-ro">${ro}</span></div></td>`;
+      }
+    }
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+
+function buildConfusionTable() {
+  const t = document.getElementById('confusion-table');
+  let html = '<thead><tr><th>System</th><th>Confusion</th><th>Memory Hook</th></tr></thead><tbody>';
+  CONFUSION.forEach(r => {
+    html += `<tr>
+      <td><span class="tag ${r.tag}">${r.sys}</span></td>
+      <td><span class="confusion-jp">${r.chars}</span></td>
+      <td>${r.tip}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  t.innerHTML = html;
+}
+
+function buildPhraseTable(tableId, data) {
+  const t = document.getElementById(tableId);
+  let html = '';
+  data.forEach((p, i) => {
+    html += `<tr>
+      <td class="num-col">${i+1}</td>
+      <td class="jp-col">${p.jp}<span class="ro-col">${p.ro}</span></td>
+      <td class="en-col">${p.en}${p.note ? `<div class="note">${p.note}</div>` : ''}</td>
+    </tr>`;
+  });
+  t.innerHTML = html;
+}
+
+function buildNumbersGrid() {
+  const g = document.getElementById('numbers-grid');
+  let html = '';
+  NUMBERS.forEach(n => {
+    html += `<div class="number-cell">
+      <div class="number-jp">${n.jp}</div>
+      <div class="number-ro">${n.ro}</div>
+      <div class="number-en">${n.en}</div>
+    </div>`;
+  });
+  g.innerHTML = html;
+}
+
+function buildCountersTable() {
+  const t = document.getElementById('counters-table');
+  let html = '';
+  COUNTERS.forEach((p, i) => {
+    html += `<tr>
+      <td class="num-col">${i+1}</td>
+      <td class="jp-col">${p.jp}<span class="ro-col">${p.ro}</span></td>
+      <td class="en-col">${p.en}${p.note ? `<div class="note">${p.note}</div>` : ''}</td>
+    </tr>`;
+  });
+  t.innerHTML = html;
+}
+
+function buildScenarios(filter = '') {
+  const list = document.getElementById('scenario-list');
+  const noResults = document.getElementById('no-results');
+  const q = filter.toLowerCase().trim();
+  let anyVisible = false;
+
+  let html = '';
+  SCENARIOS.forEach(s => {
+    const matchPhrases = q ? s.phrases.filter(p =>
+      p.jp.includes(q) ||
+      p.ro.toLowerCase().includes(q) ||
+      p.en.toLowerCase().includes(q) ||
+      (p.note && p.note.toLowerCase().includes(q))
+    ) : s.phrases;
+
+    const titleMatch = !q || s.title.toLowerCase().includes(q);
+    if (!q || titleMatch || matchPhrases.length > 0) {
+      anyVisible = true;
+      const phrases = titleMatch && !q ? s.phrases : matchPhrases;
+      const isOpen = q && phrases.length > 0;
+      const emergencyClass = s.emergency ? ' emergency' : '';
+      const openClass = isOpen ? ' open' : '';
+      html += `<div class="scenario-card${emergencyClass}${openClass}" id="sc-${s.id}">
+        <div class="scenario-header" onclick="toggleScenario('${s.id}')">
+          <span class="scenario-emoji">${s.emoji}</span>
+          <div class="scenario-info">
+            <div class="scenario-title">${s.title}</div>
+            <div class="scenario-count">${s.phrases.length} phrases</div>
+          </div>
+          <span class="scenario-chevron">▾</span>
+        </div>
+        <div class="scenario-body">
+          ${s.tip ? `<div class="scenario-tip">💡 ${s.tip}</div>` : ''}
+          <table class="phrase-table">
+            ${phrases.map((p, i) => `<tr>
+              <td class="num-col">${i+1}</td>
+              <td class="jp-col">${highlight(p.jp, q)}<span class="ro-col">${highlight(p.ro, q)}</span></td>
+              <td class="en-col">${highlight(p.en, q)}${p.note ? `<div class="note">${p.note}</div>` : ''}</td>
+            </tr>`).join('')}
+          </table>
+        </div>
+      </div>`;
+    }
+  });
+
+  list.innerHTML = html;
+  noResults.style.display = anyVisible ? 'none' : 'block';
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re, '<mark style="background:#fff3a3;border-radius:2px;">$1</mark>');
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showSubTab(group, id) {
+  const panel = document.getElementById('tab-' + group);
+  panel.querySelectorAll('.sub-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  panel.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById(group + '-' + id);
+  target.classList.add('active');
+  target.style.display = 'block';
+  event.target.classList.add('active');
+}
+
+function toggleScenario(id) {
+  const card = document.getElementById('sc-' + id);
+  card.classList.toggle('open');
+}
+
+function filterScenarios(val) {
+  buildScenarios(val);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildCharTable('hira-basic', HIRA_BASIC);
+  buildCharTable('hira-daku', HIRA_DAKU);
+  buildCharTable('kata-basic', KATA_BASIC);
+  buildCharTable('kata-daku', KATA_DAKU);
+  buildConfusionTable();
+  buildPhraseTable('top15-table', TOP15);
+  buildPhraseTable('greetings-table', GREETINGS);
+  buildNumbersGrid();
+  buildCountersTable();
+  buildScenarios();
+
+  // Fix sub-panel initial state for phrases
+  document.querySelectorAll('#tab-phrases .sub-panel').forEach(p => {
+    p.style.display = p.classList.contains('active') ? 'block' : 'none';
+  });
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+});
+</script>
+</body>
+</html>
